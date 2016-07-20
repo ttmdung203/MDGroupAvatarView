@@ -1,0 +1,16 @@
+use_frameworks!
+
+target 'MDGroupAvatarView_Example' do
+    use_frameworks!
+    pod 'MDGroupAvatarView', :path => '../'
+
+  target 'MDGroupAvatarView_Tests' do
+    inherit! :search_paths
+
+  pod 'Quick', '~> 0.8'
+  pod 'Nimble', '~> 3.0'
+  pod 'FBSnapshotTestCase'
+  pod 'Nimble-Snapshots'
+  end
+end
+

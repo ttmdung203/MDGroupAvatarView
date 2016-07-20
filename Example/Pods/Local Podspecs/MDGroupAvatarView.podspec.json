@@ -1,0 +1,27 @@
+{
+  "name": "MDGroupAvatarView",
+  "version": "0.1.0",
+  "summary": "A short description of MDGroupAvatarView.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/<GITHUB_USERNAME>/MDGroupAvatarView",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "dungttm": "dungttm@vng.com.vn"
+  },
+  "source": {
+    "git": "https://github.com/<GITHUB_USERNAME>/MDGroupAvatarView.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "MDGroupAvatarView/Classes/**/*",
+  "dependencies": {
+    "SDWebImage": [
+      "~>3.8"
+    ]
+  }
+}
