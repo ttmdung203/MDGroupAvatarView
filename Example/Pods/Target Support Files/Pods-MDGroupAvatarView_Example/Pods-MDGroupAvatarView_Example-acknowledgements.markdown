@@ -3,7 +3,7 @@ This application makes use of the following third party libraries:
 
 ## MDGroupAvatarView
 
-Copyright (c) 2016 dungttm <dungttm@vng.com.vn>
+Copyright (c) 2016 dungttm <ttmdung203@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -2,7 +2,7 @@ use_frameworks!
 
 target 'MDGroupAvatarView_Example' do
     use_frameworks!
-    pod 'MDGroupAvatarView', :path => '../'
+    pod 'MDGroupAvatarView', :git => 'https://github.com/ttmdung203/MDGroupAvatarView.git'
 
   target 'MDGroupAvatarView_Tests' do
     inherit! :search_paths
