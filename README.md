@@ -1,0 +1,2 @@
+# MDGroupAvatarView
+MDGroupAvatarView cocoapod
