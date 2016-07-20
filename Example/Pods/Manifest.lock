@@ -18,14 +18,19 @@ PODS:
 
 DEPENDENCIES:
   - FBSnapshotTestCase
-  - MDGroupAvatarView (from `../`)
+  - MDGroupAvatarView (from `https://github.com/ttmdung203/MDGroupAvatarView.git`)
   - Nimble (~> 3.0)
   - Nimble-Snapshots
   - Quick (~> 0.8)
 
 EXTERNAL SOURCES:
   MDGroupAvatarView:
-    :path: ../
+    :git: https://github.com/ttmdung203/MDGroupAvatarView.git
+
+CHECKOUT OPTIONS:
+  MDGroupAvatarView:
+    :commit: cb5b1cd8869b2639add3f4b7455fd497ae976764
+    :git: https://github.com/ttmdung203/MDGroupAvatarView.git
 
 SPEC CHECKSUMS:
   FBSnapshotTestCase: 432afd8d059ccef7f207225894840a03fbcf7474
@@ -35,6 +40,6 @@ SPEC CHECKSUMS:
   Quick: 18d057bc66451eedd5d1c8dc99ba2a5db6e60226
   SDWebImage: 35f9627a3e44b4f292a8a8ce6a531fa488239b91
 
-PODFILE CHECKSUM: 3b43dd8a2d16735bc960a9db166533280263b31e
+PODFILE CHECKSUM: db2156aa4862065bb2f02ef49876b35fd5e1316c
 
 COCOAPODS: 1.0.1
