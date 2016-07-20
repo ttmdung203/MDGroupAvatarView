@@ -17,9 +17,7 @@ Pod::Spec.new do |s|
 #   * Write the description between the DESC delimiters below.
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
-  s.description      = <<-DESC
-TODO: Add long description of the pod here.
-                       DESC
+  s.description      = ‘This library provides a custom UIView with support for showing group of avatars. It’s use for group chat. The images list can be loaded from local or web url. The dependency CocoaPod is SDWebImage’
 
   s.homepage         = 'https://github.com/ttmdung203/MDGroupAvatarView'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
