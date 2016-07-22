@@ -34,7 +34,7 @@ class ViewController: UIViewController {
     func reloadUrlAvatarGroupView() {
         var urls = Array<NSURL>()
         urls.append(NSURL(string: "https://farm9.staticflickr.com/8337/27806585274_3a45679f7c_m.jpg")!)
-        urls.append(NSURL(string: "https://farm9.staticflickr.com/8523/27806584064_52a4195c85_m.jpg")!)
+        urls.append(NSURL(string: "https://farm9.staticflickr.com/8623/28463059895_a13bca9402_m.jpg")!)
         urls.append(NSURL(string: "https://farm8.staticflickr.com/7723/27806590154_1eb7abd40c_m.jpg")!)
         urls.append(NSURL(string: "https://farm9.staticflickr.com/8895/28318492162_11dab9b021_m.jpg")!)
         urlGroupAvatarView.setAvatarUrl(urls, realTotal: Int(urlStepper.value))
