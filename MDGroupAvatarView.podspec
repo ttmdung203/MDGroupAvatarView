@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MDGroupAvatarView'
-  s.version          = ‘0.0.3’
+  s.version          = '0.0.3'
   s.summary          = 'Custom UIView show group of avatar'
   s.description      = 'This library provides a custom UIView with support for showing group of avatars. It’s use for group chat. The images list can be loaded from local or web url. The dependency CocoaPod is SDWebImage'
 
