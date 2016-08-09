@@ -8,6 +8,7 @@
 import UIKit
 import SDWebImage
 
+/// view contains avatars of group.
 class MDGroupAvatarView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     private var avatarUrls = Array<NSURL>()
     private var avatarImages = Array<UIImage>()
@@ -15,6 +16,9 @@ class MDGroupAvatarView: UIView, UICollectionViewDataSource, UICollectionViewDel
     private var realTotal : Int = 0
     var placeHolderImage: UIImage?
     
+/** 
+     Initialize with decoder
+ */
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         avatarUrls = Array<NSURL>()
@@ -37,6 +41,13 @@ class MDGroupAvatarView: UIView, UICollectionViewDataSource, UICollectionViewDel
     }
     
     //MARK: Public
+    /**
+     Set list of avatar (NSURL), the avatar'll be downloaded from the url. (use framework SDWebImage)
+     - Parameters:
+        + urls: List of avatars (4 item at most)
+        + realTotal: total of group, if number is greater than 4, the count is displayed on the last item.
+     */
+    
     func setAvatarUrl(urls: Array<NSURL>?, realTotal : Int){
         avatarImages.removeAll()
         avatarUrls = urls == nil ? Array<NSURL>() :  Array<NSURL>(urls!)
@@ -44,6 +55,12 @@ class MDGroupAvatarView: UIView, UICollectionViewDataSource, UICollectionViewDel
         avatarCollectionView?.reloadData()
     }
     
+    /**
+     Set list of avatar (UIImage)
+     - Parameters:
+        + images: List of avatars (4 item at most)
+        + realTotal: total of group, if number is greater than 4, the count is displayed on the last item.
+     */
     func setAvatarImages(images: Array<UIImage>?, realTotal : Int) {
         avatarUrls.removeAll()
         avatarImages = images == nil ? Array<UIImage>() : Array<UIImage>(images!)
@@ -107,7 +124,7 @@ class MDGroupAvatarView: UIView, UICollectionViewDataSource, UICollectionViewDel
     
 }
 
-class MDAvatarCollectionViewLayout : UICollectionViewLayout {
+private class MDAvatarCollectionViewLayout : UICollectionViewLayout {
     private var cache = [UICollectionViewLayoutAttributes]()
     
     override func prepareLayout() {
