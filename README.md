@@ -16,7 +16,7 @@ This library provides a custom UIView with support for showing group of avatars.
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
-Drag UIView to storyboard or xib file. Then assign class of this view is UIGroupAvatarView.
+Drag UIView to storyboard or xib file. Then assign class of this view is MDGroupAvatarView.
 
 NOTE: ```localGroupAvatarView ``` and ```urlGroupAvatarView``` in this example are two properties connected to Storyboard.
 
