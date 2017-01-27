@@ -6,7 +6,6 @@ or Objective-C expressions. Inspired by
 
 ```swift
 // Swift
-
 expect(1 + 1).to(equal(2))
 expect(1.2).to(beCloseTo(1.1, within: 0.1))
 expect(3) > 2
@@ -24,7 +23,7 @@ expect(ocean.isClean).toEventually(beTruthy())
 - [Some Background: Expressing Outcomes Using Assertions in XCTest](#some-background-expressing-outcomes-using-assertions-in-xctest)
 - [Nimble: Expectations Using `expect(...).to`](#nimble-expectations-using-expectto)
   - [Custom Failure Messages](#custom-failure-messages)
-  - [Type Checking](#type-checking)
+  - [Type Safety](#type-safety)
   - [Operator Overloads](#operator-overloads)
   - [Lazily Computed Values](#lazily-computed-values)
   - [C Primitives](#c-primitives)
@@ -32,17 +31,20 @@ expect(ocean.isClean).toEventually(beTruthy())
   - [Objective-C Support](#objective-c-support)
   - [Disabling Objective-C Shorthand](#disabling-objective-c-shorthand)
 - [Built-in Matcher Functions](#built-in-matcher-functions)
+  - [Type Checking](#type-checking)
   - [Equivalence](#equivalence)
   - [Identity](#identity)
   - [Comparisons](#comparisons)
   - [Types/Classes](#typesclasses)
   - [Truthiness](#truthiness)
+  - [Swift Assertions](#swift-assertions)
   - [Swift Error Handling](#swift-error-handling)
   - [Exceptions](#exceptions)
   - [Collection Membership](#collection-membership)
   - [Strings](#strings)
   - [Checking if all elements of a collection pass a condition](#checking-if-all-elements-of-a-collection-pass-a-condition)
   - [Verify collection count](#verify-collection-count)
+  - [Verify a notification was posted](#verifying-a-notification-was-posted)
   - [Matching a value to any of a group of matchers](#matching-a-value-to-any-of-a-group-of-matchers)
 - [Writing Your Own Matchers](#writing-your-own-matchers)
   - [Lazy Evaluation](#lazy-evaluation)
@@ -163,7 +165,7 @@ expect(@(1+1)).toWithDescription(equal(@3), @"Make sure libKindergartenMath is l
 // expected to equal <3.0000>, got <2.0000>
 ```
 
-## Type Checking
+## Type Safety
 
 Nimble makes sure you don't compare two types that don't match:
 
@@ -328,6 +330,9 @@ cases, use the `timeout` parameter:
 
 // Waits three seconds for ocean to contain "starfish":
 expect(ocean).toEventually(contain("starfish"), timeout: 3)
+
+// Evaluate someValue every 0.2 seconds repeatedly until it equals 100, or fails if it timeouts after 5.5 seconds.
+expect(someValue).toEventually(equal(100), timeout: 5.5, pollInterval: 0.2)
 ```
 
 ```objc
@@ -394,10 +399,10 @@ the default timeout and poll interval values. This can be done as follows:
 // Swift
 
 // Increase the global timeout to 5 seconds:
-Nimble.Defaults.AsyncTimeout = 5
+Nimble.AsyncDefaults.Timeout = 5
 
 // Slow the polling interval to 0.1 seconds:
-Nimble.Defaults.AsyncPollInterval = 0.1
+Nimble.AsyncDefaults.PollInterval = 0.1
 ```
 
 ## Objective-C Support
@@ -406,7 +411,8 @@ Nimble has full support for Objective-C. However, there are two things
 to keep in mind when using Nimble in Objective-C:
 
 1. All parameters passed to the `expect` function, as well as matcher
-   functions like `equal`, must be Objective-C objects:
+   functions like `equal`, must be Objective-C objects or can be converted into
+   an `NSObject` equivalent:
 
    ```objc
    // Objective-C
@@ -415,6 +421,17 @@ to keep in mind when using Nimble in Objective-C:
 
    expect(@(1 + 1)).to(equal(@2));
    expect(@"Hello world").to(contain(@"world"));
+
+   // Boxed as NSNumber *
+   expect(2).to(equal(2));
+   expect(1.2).to(beLessThan(2.0));
+   expect(true).to(beTruthy());
+
+   // Boxed as NSString *
+   expect("Hello world").to(equal("Hello world"));
+
+   // Boxed as NSRange
+   expect(NSMakeRange(1, 10)).to(equal(NSMakeRange(1, 10)));
    ```
 
 2. To make an expectation on an expression that does not return a value,
@@ -426,6 +443,28 @@ to keep in mind when using Nimble in Objective-C:
 
    expectAction(^{ [exception raise]; }).to(raiseException());
    ```
+
+The following types are currently converted to an `NSObject` type:
+
+ - **C Numeric types** are converted to `NSNumber *`
+ - `NSRange` is converted to `NSValue *`
+ - `char *` is converted to `NSString *`
+
+For the following matchers:
+
+- `equal`
+- `beGreaterThan`
+- `beGreaterThanOrEqual`
+- `beLessThan`
+- `beLessThanOrEqual`
+- `beCloseTo`
+- `beTrue`
+- `beFalse`
+- `beTruthy`
+- `beFalsy`
+- `haveCount`
+
+If you would like to see more, [file an issue](https://github.com/Quick/Nimble/issues).
 
 ## Disabling Objective-C Shorthand
 
@@ -450,6 +489,67 @@ NMB_expect(^{ return seagull.squawk; }, __FILE__, __LINE__).to(NMB_equal(@"Squee
 # Built-in Matcher Functions
 
 Nimble includes a wide variety of matcher functions.
+
+## Type Checking
+
+Nimble supports checking the type membership of any kind of object, whether
+Objective-C conformant or not:
+
+```swift
+// Swift 
+
+protocol SomeProtocol{}
+class SomeClassConformingToProtocol: SomeProtocol{}
+struct SomeStructConformingToProtocol: SomeProtocol{}
+
+// The following tests pass
+expect(1).to(beKindOf(Int.self))
+expect("turtle").to(beKindOf(String.self))
+
+let classObject = SomeClassConformingToProtocol()
+expect(classObject).to(beKindOf(SomeProtocol.self))
+expect(classObject).to(beKindOf(SomeClassConformingToProtocol.self))
+expect(classObject).toNot(beKindOf(SomeStructConformingToProtocol.self))
+
+let structObject = SomeStructConformingToProtocol()
+expect(structObject).to(beKindOf(SomeProtocol.self))
+expect(structObject).to(beKindOf(SomeStructConformingToProtocol.self))
+expect(structObject).toNot(beKindOf(SomeClassConformingToProtocol.self))
+```
+
+```objc
+// Objective-C
+
+// The following tests pass
+NSMutableArray *array = [NSMutableArray array];
+expect(array).to(beAKindOf([NSArray class]));
+expect(@1).toNot(beAKindOf([NSNull class]));
+```
+
+Objects can be tested for their exact types using the `beAnInstanceOf` matcher:
+```swift
+// Swift 
+
+protocol SomeProtocol{}
+class SomeClassConformingToProtocol: SomeProtocol{}
+struct SomeStructConformingToProtocol: SomeProtocol{}
+
+// Unlike the 'beKindOf' matcher, the 'beAnInstanceOf' matcher only 
+// passes if the object is the EXACT type requested. The following
+// tests pass -- note its behavior when working in an inheritance hierarchy. 
+expect(1).to(beAnInstanceOf(Int.self))
+expect("turtle").to(beAnInstanceOf(String.self))
+
+let classObject = SomeClassConformingToProtocol()
+expect(classObject).toNot(beAnInstanceOf(SomeProtocol.self))
+expect(classObject).to(beAnInstanceOf(SomeClassConformingToProtocol.self))
+expect(classObject).toNot(beAnInstanceOf(SomeStructConformingToProtocol.self))
+
+let structObject = SomeStructConformingToProtocol()
+expect(structObject).toNot(beAnInstanceOf(SomeProtocol.self))
+expect(structObject).to(beAnInstanceOf(SomeStructConformingToProtocol.self))
+expect(structObject).toNot(beAnInstanceOf(SomeClassConformingToProtocol.self))
+````
 
 ## Equivalence
 
@@ -491,6 +591,9 @@ expect(actual) === expected
 expect(actual).toNot(beIdenticalTo(expected))
 expect(actual) !== expected
 ```
+
+Its important to remember that `beIdenticalTo` only makes sense when comparing types with reference semantics, which have a notion of identity. In Swift, that means a `class`. This matcher will not work with types with value semantics such as `struct` or `enum`. If you need to compare two value types, you can either compare individual properties or if it makes sense to do so, make your type implement `Equatable` and use Nimble's equivalence matchers instead.
+
 
 ```objc
 // Objective-C
@@ -646,13 +749,13 @@ expect(dolphin).to(beAKindOf([Mammal class]));
 // Passes if actual is not nil, true, or an object with a boolean value of true:
 expect(actual).to(beTruthy())
 
-// Passes if actual is only true (not nil or an object conforming to BooleanType true):
+// Passes if actual is only true (not nil or an object conforming to Boolean true):
 expect(actual).to(beTrue())
 
 // Passes if actual is nil, false, or an object with a boolean value of false:
 expect(actual).to(beFalsy())
 
-// Passes if actual is only false (not nil or an object conforming to BooleanType false):
+// Passes if actual is only false (not nil or an object conforming to Boolean false):
 expect(actual).to(beFalse())
 
 // Passes if actual is nil:
@@ -665,18 +768,51 @@ expect(actual).to(beNil())
 // Passes if actual is not nil, true, or an object with a boolean value of true:
 expect(actual).to(beTruthy());
 
-// Passes if actual is only true (not nil or an object conforming to BooleanType true):
+// Passes if actual is only true (not nil or an object conforming to Boolean true):
 expect(actual).to(beTrue());
 
 // Passes if actual is nil, false, or an object with a boolean value of false:
 expect(actual).to(beFalsy());
 
-// Passes if actual is only false (not nil or an object conforming to BooleanType false):
+// Passes if actual is only false (not nil or an object conforming to Boolean false):
 expect(actual).to(beFalse());
 
 // Passes if actual is nil:
 expect(actual).to(beNil());
 ```
+
+## Swift Assertions
+
+If you're using Swift, you can use the `throwAssertion` matcher to check if an assertion is thrown (e.g. `fatalError()`). This is made possible by [@mattgallagher](https://github.com/mattgallagher)'s [CwlPreconditionTesting](https://github.com/mattgallagher/CwlPreconditionTesting) library.
+
+```swift
+// Swift
+
+// Passes if somethingThatThrows() throws an assertion, such as calling fatalError() or precondition fails:
+expect { () -> Void in fatalError() }.to(throwAssertion())
+expect { precondition(false) }.to(throwAssertion())
+
+// Passes if throwing a NSError is not equal to throwing an assertion:
+expect { throw NSError(domain: "test", code: 0, userInfo: nil) }.toNot(throwAssertion())
+
+// Passes if the post assertion code is not run:
+var reachedPoint1 = false
+var reachedPoint2 = false
+expect {
+    reachedPoint1 = true
+    precondition(false, "condition message")
+    reachedPoint2 = true
+}.to(throwAssertion())
+
+expect(reachedPoint1) == true
+expect(reachedPoint2) == false
+```
+
+Notes:
+
+* This feature is only available in Swift.
+* It is only supported for `x86_64` binaries, meaning _you cannot run this matcher on iOS devices, only simulators_.
+* The tvOS simulator is supported, but using a different mechanism, requiring you to turn off the `Debug executable` scheme setting for your tvOS scheme's Test configuration.
 
 ## Swift Error Handling
 
@@ -685,11 +821,11 @@ If you're using Swift 2.0+, you can use the `throwError` matcher to check if an 
 ```swift
 // Swift
 
-// Passes if somethingThatThrows() throws an ErrorType:
+// Passes if somethingThatThrows() throws an ErrorProtocol:
 expect{ try somethingThatThrows() }.to(throwError())
 
 // Passes if somethingThatThrows() throws an error with a given domain:
-expect{ try somethingThatThrows() }.to(throwError { (error: ErrorType) in
+expect{ try somethingThatThrows() }.to(throwError { (error: ErrorProtocol) in
     expect(error._domain).to(equal(NSCocoaErrorDomain))
 })
 
@@ -697,7 +833,24 @@ expect{ try somethingThatThrows() }.to(throwError { (error: ErrorType) in
 expect{ try somethingThatThrows() }.to(throwError(NSCocoaError.PropertyListReadCorruptError))
 
 // Passes if somethingThatThrows() throws an error with a given type:
-expect{ try somethingThatThrows() }.to(throwError(errorType: MyError.self))
+expect{ try somethingThatThrows() }.to(throwError(errorType: NimbleError.self))
+```
+
+If you are working directly with `ErrorProtocol` values, as is sometimes the case when using `Result` or `Promise` types, you can use the `matchError` matcher to check if the error is the same error is is supposed to be, without requiring explicit casting.
+
+```swift
+// Swift
+
+let actual: ErrorProtocol = …
+
+// Passes if actual contains any error value from the NimbleErrorEnum type:
+expect(actual).to(matchError(NimbleErrorEnum))
+
+// Passes if actual contains the Timeout value from the NimbleErrorEnum type:
+expect(actual).to(matchError(NimbleErrorEnum.Timeout))
+
+// Passes if actual contains an NSError equal to the given one:
+expect(actual).to(matchError(NSError(domain: "err", code: 123, userInfo: nil)))
 ```
 
 Note: This feature is only available in Swift.
@@ -820,6 +973,47 @@ expect(actual).to(endWith(expected));
   Like `contain`, in Objective-C `beginWith` and `endWith` only support
   a single argument [for now](https://github.com/Quick/Nimble/issues/27).
 
+For code that returns collections of complex objects without a strict
+ordering, there is the `containElementSatisfying` matcher:
+
+```swift
+struct Turtle {
+	var color: String!
+}
+
+var turtles = functionThatReturnsSomeTurtlesInAnyOrder()
+
+// This set of matchers passes whether the array is [{color: "blue"}, {color: "green"}]
+// or [{color: "green"}, {color: "blue"}]
+expect(turtles).to(containElementSatisfying({ turtle in
+	return turtle.color == "green"
+}))
+expect(turtles).to(containElementSatisfying({ turtle in
+	return turtle.color == "blue"
+}, "that is a turtle with color 'blue'"))
+
+// The second matcher will incorporate the provided string in the error message
+// should it fail
+```
+
+```objc
+@interface Turtle: NSObject
+@property(nonatomic) NSString *color;
+@end
+@implementation Turtle @end
+
+NSArray *turtles = functionThatReturnsSomeTurtlesInAnyOrder();
+
+// This set of matchers passes whether the array is [{color: "blue"}, {color: "green"}]
+// or [{color: "green"}, {color: "blue"}]
+expect(turtles).to(containElementSatisfying(^BOOL(id object) {
+	return [turtle.color isEqualToString:@"green"];
+}));
+expect(turtles).to(containElementSatisfying(^BOOL(id object) {
+	return [turtle.color isEqualToString:@"blue"];
+}));
+```
+
 ## Strings
 
 ```swift
@@ -878,7 +1072,7 @@ expect([1,2,3,4]).to(allPass(beLessThan(5)))
 expect(@[@1, @2, @3,@4]).to(allPass(beLessThan(@5)));
 ```
 
-For Swift the actual value has to be a SequenceType, e.g. an array, a set or a custom seqence type.
+For Swift the actual value has to be a Sequence, e.g. an array, a set or a custom seqence type.
 
 For Objective-C the actual value has to be a NSFastEnumeration, e.g. NSArray and NSSet, of NSObjects and only the variant which
 uses another matcher is available here.
@@ -886,6 +1080,8 @@ uses another matcher is available here.
 ## Verify collection count
 
 ```swift
+// Swift
+
 // passes if actual collection's count is equal to expected
 expect(actual).to(haveCount(expected))
 
@@ -894,6 +1090,8 @@ expect(actual).notTo(haveCount(expected))
 ```
 
 ```objc
+// Objective-C
+
 // passes if actual collection's count is equal to expected
 expect(actual).to(haveCount(expected))
 
@@ -901,9 +1099,33 @@ expect(actual).to(haveCount(expected))
 expect(actual).notTo(haveCount(expected))
 ```
 
-For Swift the actual value must be a `CollectionType` such as array, dictionary or set.
+For Swift the actual value must be a `Collection` such as array, dictionary or set.
 
 For Objective-C the actual value has to be one of the following classes `NSArray`, `NSDictionary`, `NSSet`, `NSHashTable` or one of their subclasses.
+
+## Foundation
+
+### Verifying a Notification was posted
+
+```swift
+// Swift
+let testNotification = Notification(name: "Foo", object: nil)
+
+// passes if the closure in expect { ... } posts a notification to the default
+// notification center.
+expect {
+    NotificationCenter.default.postNotification(testNotification)
+}.to(postNotifications(equal([testNotification]))
+
+// passes if the closure in expect { ... } posts a notification to a given
+// notification center
+let notificationCenter = NotificationCenter()
+expect {
+    notificationCenter.postNotification(testNotification)
+}.to(postNotifications(equal([testNotification]), fromNotificationCenter: notificationCenter))
+```
+
+> This matcher is only available in Swift.
 
 ## Matching a value to any of a group of matchers
 
@@ -928,10 +1150,10 @@ expect(actual).to(satisfyAnyOf(beLessThan(@10), beGreaterThan(@20)))
 expect(@6).to(satisfyAnyOf(equal(@2), equal(@3), equal(@4), equal(@5), equal(@6), equal(@7)))
 ```
 
-Note: This matcher allows you to chain any number of matchers together. This provides flexibility, 
-      but if you find yourself chaining many matchers together in one test, consider whether you  
-      could instead refactor that single test into multiple, more precisely focused tests for 
-      better coverage. 
+Note: This matcher allows you to chain any number of matchers together. This provides flexibility,
+      but if you find yourself chaining many matchers together in one test, consider whether you
+      could instead refactor that single test into multiple, more precisely focused tests for
+      better coverage.
 
 # Writing Your Own Matchers
 
@@ -944,7 +1166,11 @@ value and return a `MatcherFunc` closure. Take `equal`, for example:
 public func equal<T: Equatable>(expectedValue: T?) -> MatcherFunc<T?> {
   return MatcherFunc { actualExpression, failureMessage in
     failureMessage.postfixMessage = "equal <\(expectedValue)>"
-    return actualExpression.evaluate() == expectedValue
+    if let actualValue = try actualExpression.evaluate() {
+    	return actualValue == expectedValue
+    } else {
+    	return false
+    }
   }
 }
 ```
@@ -966,7 +1192,7 @@ in an Xcode project you distribute to others.
   distribute it yourself via GitHub.
 
 For examples of how to write your own matchers, just check out the
-[`Matchers` directory](https://github.com/Quick/Nimble/tree/master/Nimble/Matchers)
+[`Matchers` directory](https://github.com/Quick/Nimble/tree/master/Sources/Nimble/Matchers)
 to see how Nimble's built-in set of matchers are implemented. You can
 also check out the tips below.
 
@@ -1111,11 +1337,11 @@ automatically generate expected value failure messages when they're nil.
 
 ```swift
 
-public func beginWith<S: SequenceType, T: Equatable where S.Generator.Element == T>(startingElement: T) -> NonNilMatcherFunc<S> {
+public func beginWith<S: Sequence, T: Equatable where S.Iterator.Element == T>(startingElement: T) -> NonNilMatcherFunc<S> {
     return NonNilMatcherFunc { actualExpression, failureMessage in
         failureMessage.postfixMessage = "begin with <\(startingElement)>"
         if let actualValue = actualExpression.evaluate() {
-            var actualGenerator = actualValue.generate()
+            var actualGenerator = actualValue.makeIterator()
             return actualGenerator.next() == startingElement
         }
         return false
@@ -1138,15 +1364,15 @@ extension NMBObjCMatcher {
 > Nimble can be used on its own, or in conjunction with its sister
   project, [Quick](https://github.com/Quick/Quick). To install both
   Quick and Nimble, follow [the installation instructions in the Quick
-  README](https://github.com/Quick/Quick#how-to-install-quick).
+  Documentation](https://github.com/Quick/Quick/blob/master/Documentation/en-us/InstallingQuick.md).
 
 Nimble can currently be installed in one of two ways: using CocoaPods, or with
 git submodules.
 
 ## Installing Nimble as a Submodule
 
-To use Nimble as a submodule to test your iOS or OS X applications, follow these
-4 easy steps:
+To use Nimble as a submodule to test your macOS, iOS or tvOS applications, follow
+these 4 easy steps:
 
 1. Clone the Nimble repository
 2. Add Nimble.xcodeproj to the Xcode workspace for your project
@@ -1160,9 +1386,9 @@ install just Nimble.
 
 ## Installing Nimble via CocoaPods
 
-To use Nimble in CocoaPods to test your iOS or OS X applications, add Nimble to
-your podfile and add the ```use_frameworks!``` line to enable Swift support for
-CocoaPods.
+To use Nimble in CocoaPods to test your macOS, iOS or tvOS applications, add
+Nimble to your podfile and add the ```use_frameworks!``` line to enable Swift
+support for CocoaPods.
 
 ```ruby
 platform :ios, '8.0'
@@ -1173,7 +1399,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 
 target 'YOUR_APP_NAME_HERE_Tests', :exclusive => true do
   use_frameworks!
-  pod 'Nimble', '~> 3.1.0'
+  pod 'Nimble', '~> 5.0.0'
 end
 ```
 
