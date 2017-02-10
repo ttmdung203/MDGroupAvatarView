@@ -1,27 +1,29 @@
 PODS:
-  - FBSnapshotTestCase (2.1.1):
-    - FBSnapshotTestCase/SwiftSupport (= 2.1.1)
-  - FBSnapshotTestCase/Core (2.1.1)
-  - FBSnapshotTestCase/SwiftSupport (2.1.1):
+  - FBSnapshotTestCase (2.1.4):
+    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
+  - FBSnapshotTestCase/Core (2.1.4)
+  - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
-  - MDGroupAvatarView (0.1.0):
+  - MDGroupAvatarView (0.0.4):
     - SDWebImage (~> 3.8)
-  - Nimble (3.2.0)
-  - Nimble-Snapshots (4.1.0):
+  - Nimble (6.0.0)
+  - Nimble-Snapshots (4.4.0):
+    - Nimble-Snapshots/Core (= 4.4.0)
+  - Nimble-Snapshots/Core (4.4.0):
     - FBSnapshotTestCase (~> 2.0)
     - Nimble
     - Quick
-  - Quick (0.9.2)
-  - SDWebImage (3.8.1):
-    - SDWebImage/Core (= 3.8.1)
-  - SDWebImage/Core (3.8.1)
+  - Quick (1.0.0)
+  - SDWebImage (3.8.2):
+    - SDWebImage/Core (= 3.8.2)
+  - SDWebImage/Core (3.8.2)
 
 DEPENDENCIES:
   - FBSnapshotTestCase
   - MDGroupAvatarView (from `https://github.com/ttmdung203/MDGroupAvatarView.git`)
-  - Nimble (~> 3.0)
+  - Nimble
   - Nimble-Snapshots
-  - Quick (~> 0.8)
+  - Quick
 
 EXTERNAL SOURCES:
   MDGroupAvatarView:
@@ -29,17 +31,17 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   MDGroupAvatarView:
-    :commit: cb5b1cd8869b2639add3f4b7455fd497ae976764
+    :commit: 0f7357377f43f1e5157757e77813739428094a39
     :git: https://github.com/ttmdung203/MDGroupAvatarView.git
 
 SPEC CHECKSUMS:
-  FBSnapshotTestCase: 432afd8d059ccef7f207225894840a03fbcf7474
-  MDGroupAvatarView: b9c9f38f17c5607e0a87bc6444a6dd447d9a8f92
-  Nimble: 703854335d181df169bbca9c97117b5cf8c47c1d
-  Nimble-Snapshots: 2da4d2ec829b458d6886c06812c52493fce284c9
-  Quick: 18d057bc66451eedd5d1c8dc99ba2a5db6e60226
-  SDWebImage: 35f9627a3e44b4f292a8a8ce6a531fa488239b91
+  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  MDGroupAvatarView: a01456e15fd882cd6cbec7a6c93a6568c79bd492
+  Nimble: 8fb9b4b34c535b2f32f52c6b9852d6f02d48610b
+  Nimble-Snapshots: e743439f26c2fa99d8f7e0d7c01c99bcb40aa6f2
+  Quick: 8024e4a47e6cc03a9d5245ef0948264fc6d27cff
+  SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
 
-PODFILE CHECKSUM: db2156aa4862065bb2f02ef49876b35fd5e1316c
+PODFILE CHECKSUM: d29644617647956decefd85b8f9198edf6daed70
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.1.1

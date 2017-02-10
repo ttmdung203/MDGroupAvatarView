@@ -7,8 +7,8 @@ target 'MDGroupAvatarView_Example' do
   target 'MDGroupAvatarView_Tests' do
     inherit! :search_paths
 
-  pod 'Quick', '~> 0.8'
-  pod 'Nimble', '~> 3.0'
+  pod 'Quick'
+  pod 'Nimble'
   pod 'FBSnapshotTestCase'
   pod 'Nimble-Snapshots'
   end
