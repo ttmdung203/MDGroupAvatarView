@@ -4,13 +4,22 @@ import Foundation
     A closure that, when evaluated, returns a dictionary of key-value
     pairs that can be accessed from within a group of shared examples.
 */
-public typealias SharedExampleContext = () -> (NSDictionary)
+public typealias SharedExampleContext = () -> [String: Any]
 
 /**
     A closure that is used to define a group of shared examples. This
     closure may contain any number of example and example groups.
 */
-public typealias SharedExampleClosure = (@escaping SharedExampleContext) -> ()
+public typealias SharedExampleClosure = (@escaping SharedExampleContext) -> Void
+
+#if canImport(Darwin)
+// swiftlint:disable type_name
+@objcMembers
+internal class _WorldBase: NSObject {}
+#else
+internal class _WorldBase: NSObject {}
+// swiftlint:enable type_name
+#endif
 
 /**
     A collection of state Quick builds up in order to work its magic.
@@ -23,7 +32,7 @@ public typealias SharedExampleClosure = (@escaping SharedExampleContext) -> ()
     You may configure how Quick behaves by calling the -[World configure:]
     method from within an overridden +[QuickConfiguration configure:] method.
 */
-final internal class World: NSObject {
+final internal class World: _WorldBase {
     /**
         The example group that is currently being run.
         The DSL requires that this group is correctly set in order to build a
@@ -39,12 +48,14 @@ final internal class World: NSObject {
 
     internal var currentExampleMetadata: ExampleMetadata?
 
+    internal var numberOfExamplesRun = 0
+
     /**
         A flag that indicates whether additional test suites are being run
         within this test suite. This is only true within the context of Quick
         functional tests.
     */
-#if _runtime(_ObjC)
+#if canImport(Darwin)
     // Convention of generating Objective-C selector has been changed on Swift 3
     @objc(isRunningAdditionalSuites)
     internal var isRunningAdditionalSuites = false
@@ -52,10 +63,11 @@ final internal class World: NSObject {
     internal var isRunningAdditionalSuites = false
 #endif
 
-    private var specs: Dictionary<String, ExampleGroup> = [:]
+    private var specs: [String: ExampleGroup] = [:]
     private var sharedExamples: [String: SharedExampleClosure] = [:]
     private let configuration = Configuration()
-    private var isConfigurationFinalized = false
+
+    internal private(set) var isConfigurationFinalized = false
 
     internal var exampleHooks: ExampleHooks {return configuration.exampleHooks }
     internal var suiteHooks: SuiteHooks { return configuration.suiteHooks }
@@ -63,7 +75,17 @@ final internal class World: NSObject {
     // MARK: Singleton Constructor
 
     private override init() {}
-    static let sharedWorld = World()
+
+    static private(set) var sharedWorld = World()
+
+    static func anotherWorld<T>(block: (World) -> T) -> T {
+        let previous = sharedWorld
+        defer { sharedWorld = previous }
+
+        let newWorld = World()
+        sharedWorld = newWorld
+        return block(newWorld)
+    }
 
     // MARK: Public Interface
 
@@ -76,8 +98,11 @@ final internal class World: NSObject {
                          be mutated to change Quick's behavior.
     */
     internal func configure(_ closure: QuickConfigurer) {
-        assert(!isConfigurationFinalized,
-               "Quick cannot be configured outside of a +[QuickConfiguration configure:] method. You should not call -[World configure:] directly. Instead, subclass QuickConfiguration and override the +[QuickConfiguration configure:] method.")
+        assert(
+            !isConfigurationFinalized,
+            // swiftlint:disable:next line_length
+            "Quick cannot be configured outside of a +[QuickConfiguration configure:] method. You should not call -[World configure:] directly. Instead, subclass QuickConfiguration and override the +[QuickConfiguration configure:] method."
+        )
         closure(configuration)
     }
 
@@ -87,6 +112,17 @@ final internal class World: NSObject {
     */
     internal func finalizeConfiguration() {
         isConfigurationFinalized = true
+    }
+
+    /**
+     Returns `true` if the root example group for the given spec class has been already initialized.
+
+     - parameter specClass: The QuickSpec class for which is checked for the existing root example group.
+     - returns: Whether the root example group for the given spec class has been already initialized or not.
+     */
+    internal func isRootExampleGroupInitialized(forSpecClass specClass: QuickSpec.Type) -> Bool {
+        let name = String(describing: specClass)
+        return specs.keys.contains(name)
     }
 
     /**
@@ -104,11 +140,11 @@ final internal class World: NSObject {
                 it("is at the top level") {}
             }
 
-        - parameter cls: The QuickSpec class for which to retrieve the root example group.
+        - parameter specClass: The QuickSpec class for which to retrieve the root example group.
         - returns: The root example group for the class.
     */
-    internal func rootExampleGroupForSpecClass(_ cls: AnyClass) -> ExampleGroup {
-        let name = String(describing: cls)
+    internal func rootExampleGroup(forSpecClass specClass: QuickSpec.Type) -> ExampleGroup {
+        let name = String(describing: specClass)
 
         if let group = specs[name] {
             return group
@@ -132,23 +168,16 @@ final internal class World: NSObject {
         - parameter specClass: The QuickSpec subclass for which examples are to be returned.
         - returns: A list of examples to be run as test invocations.
     */
-    internal func examples(_ specClass: AnyClass) -> [Example] {
+    internal func examples(forSpecClass specClass: QuickSpec.Type) -> [Example] {
         // 1. Grab all included examples.
         let included = includedExamples
         // 2. Grab the intersection of (a) examples for this spec, and (b) included examples.
-        let spec = rootExampleGroupForSpecClass(specClass).examples.filter { included.contains($0) }
+        let spec = rootExampleGroup(forSpecClass: specClass).examples.filter { included.contains($0) }
         // 3. Remove all excluded examples.
         return spec.filter { example in
-            !self.configuration.exclusionFilters.reduce(false) { $0 || $1(example) }
+            !self.configuration.exclusionFilters.contains { $0(example) }
         }
     }
-
-#if _runtime(_ObjC)
-    @objc(examplesForSpecClass:)
-    private func objc_examples(_ specClass: AnyClass) -> [Example] {
-        return examples(specClass)
-    }
-#endif
 
     // MARK: Internal
 
@@ -165,6 +194,8 @@ final internal class World: NSObject {
     internal var includedExampleCount: Int {
         return includedExamples.count
     }
+
+    internal lazy var cachedIncludedExampleCount: Int = self.includedExampleCount
 
     internal var beforesCurrentlyExecuting: Bool {
         let suiteBeforesExecuting = suiteHooks.phase == .beforesExecuting
@@ -208,7 +239,7 @@ final internal class World: NSObject {
     private var includedExamples: [Example] {
         let all = allExamples
         let included = all.filter { example in
-            return self.configuration.inclusionFilters.reduce(false) { $0 || $1(example) }
+            return self.configuration.inclusionFilters.contains { $0(example) }
         }
 
         if included.isEmpty && configuration.runAllWhenEverythingFiltered {
