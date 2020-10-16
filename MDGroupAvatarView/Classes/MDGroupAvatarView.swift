@@ -33,10 +33,10 @@ class MDGroupAvatarView: UIView, UICollectionViewDataSource, UICollectionViewDel
         
         avatarCollectionView?.translatesAutoresizingMaskIntoConstraints = false
         
-        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutAttribute.leading, relatedBy: NSLayoutRelation.equal, toItem: self, attribute: NSLayoutAttribute.leading, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutAttribute.trailing, relatedBy: NSLayoutRelation.equal, toItem: self, attribute: NSLayoutAttribute.trailing, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy:  NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutConstraint.Attribute.leading, relatedBy:  NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.leading, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutConstraint.Attribute.trailing, relatedBy:  NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.trailing, multiplier: 1, constant: 0))
         setNeedsUpdateConstraints()
     }
     
@@ -100,7 +100,7 @@ class MDGroupAvatarView: UIView, UICollectionViewDataSource, UICollectionViewDel
                 label.textColor = UIColor.white
                 label.font = UIFont.systemFont(ofSize: 13)
                 label.textAlignment = NSTextAlignment.center
-                label.text = "\(self.realTotal ?? 0)"
+                label.text = "\(self.realTotal)"
             }
         }
 
