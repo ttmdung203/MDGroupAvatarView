@@ -16,9 +16,8 @@ class MDGroupAvatarView: UIView, UICollectionViewDataSource, UICollectionViewDel
     fileprivate var realTotal : Int = 0
     var placeHolderImage: UIImage?
     
-/** 
-     Initialize with decoder
- */
+    /// Initialize with decoder
+    /// - Parameter aDecoder: decoder
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         avatarUrls = Array<URL>()
@@ -33,21 +32,41 @@ class MDGroupAvatarView: UIView, UICollectionViewDataSource, UICollectionViewDel
         
         avatarCollectionView?.translatesAutoresizingMaskIntoConstraints = false
         
-        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy:  NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutConstraint.Attribute.leading, relatedBy:  NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.leading, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: avatarCollectionView!, attribute: NSLayoutConstraint.Attribute.trailing, relatedBy:  NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.trailing, multiplier: 1, constant: 0))
+        NSLayoutConstraint(item: avatarCollectionView!,
+                                         attribute: .top,
+                                         relatedBy: .equal,
+                                         toItem: self,
+                                         attribute: .top,
+                                         multiplier: 1,
+                           constant: 0).isActive = true
+        NSLayoutConstraint(item: avatarCollectionView!,
+                                         attribute: .bottom,
+                                         relatedBy: .equal,
+                                         toItem: self,
+                                         attribute: .bottom,
+                                         multiplier: 1,
+                           constant: 0).isActive = true
+        NSLayoutConstraint(item: avatarCollectionView!,
+                           attribute: .leading,
+                           relatedBy:  .equal,
+                           toItem: self,
+                           attribute: .leading,
+                           multiplier: 1,
+                           constant: 0).isActive = true
+        NSLayoutConstraint(item: avatarCollectionView!,
+                           attribute: .trailing,
+                           relatedBy: .equal,
+                           toItem: self,
+                           attribute: .trailing,
+                           multiplier: 1,
+                           constant: 0).isActive = true
         setNeedsUpdateConstraints()
     }
     
-    //MARK: Public
-    /**
-     Set list of avatar (NSURL), the avatar'll be downloaded from the url. (use framework SDWebImage)
-     - Parameters:
-        + urls: List of avatars (4 item at most)
-        + realTotal: total of group, if number is greater than 4, the count is displayed on the last item.
-     */
-    
+    /// Set list of avatar (NSURL), the avatar'll be downloaded from the url. (use framework SDWebImage)
+    /// - Parameters:
+    ///   - urls: List of avatars (4 item at most)
+    ///   - realTotal: total of group, if number is greater than 4, the count is displayed on the last item.
     func setAvatarUrl(_ urls: Array<URL>?, realTotal : Int){
         avatarImages.removeAll()
         avatarUrls = urls == nil ? Array<URL>() :  Array<URL>(urls!)
@@ -55,12 +74,10 @@ class MDGroupAvatarView: UIView, UICollectionViewDataSource, UICollectionViewDel
         avatarCollectionView?.reloadData()
     }
     
-    /**
-     Set list of avatar (UIImage)
-     - Parameters:
-        + images: List of avatars (4 item at most)
-        + realTotal: total of group, if number is greater than 4, the count is displayed on the last item.
-     */
+    /// Set list of avatar (UIImage)
+    /// - Parameters:
+    ///   - images: List of avatars (4 item at most)
+    ///   - realTotal: total of group, if number is greater than 4, the count is displayed on the last item.
     func setAvatarImages(_ images: Array<UIImage>?, realTotal : Int) {
         avatarUrls.removeAll()
         avatarImages = images == nil ? Array<UIImage>() : Array<UIImage>(images!)
@@ -196,5 +213,4 @@ private class MDAvatarCollectionViewLayout : UICollectionViewLayout {
         }
         return layoutAttributes
     }
-
 }

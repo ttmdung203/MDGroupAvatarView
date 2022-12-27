@@ -1,6 +1,0 @@
-framework module Pods_MDGroupAvatarView_Tests {
-  umbrella header "Pods-MDGroupAvatarView_Tests-umbrella.h"
-
-  export *
-  module * { export * }
-}
