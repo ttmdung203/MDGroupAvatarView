@@ -1,47 +1,25 @@
 PODS:
-  - FBSnapshotTestCase (2.1.4):
-    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
-  - FBSnapshotTestCase/Core (2.1.4)
-  - FBSnapshotTestCase/SwiftSupport (2.1.4):
-    - FBSnapshotTestCase/Core
-  - MDGroupAvatarView (0.0.4):
-    - SDWebImage (~> 3.8)
-  - Nimble (6.0.0)
-  - Nimble-Snapshots (4.4.0):
-    - Nimble-Snapshots/Core (= 4.4.0)
-  - Nimble-Snapshots/Core (4.4.0):
-    - FBSnapshotTestCase (~> 2.0)
-    - Nimble
-    - Quick
-  - Quick (1.0.0)
-  - SDWebImage (3.8.2):
-    - SDWebImage/Core (= 3.8.2)
-  - SDWebImage/Core (3.8.2)
+  - MDGroupAvatarView (2.0.0):
+    - SDWebImage (~> 5.0)
+  - SDWebImage (5.14.2):
+    - SDWebImage/Core (= 5.14.2)
+  - SDWebImage/Core (5.14.2)
 
 DEPENDENCIES:
-  - FBSnapshotTestCase
-  - MDGroupAvatarView (from `https://github.com/ttmdung203/MDGroupAvatarView.git`)
-  - Nimble
-  - Nimble-Snapshots
-  - Quick
+  - MDGroupAvatarView (from `..`)
+
+SPEC REPOS:
+  trunk:
+    - SDWebImage
 
 EXTERNAL SOURCES:
   MDGroupAvatarView:
-    :git: https://github.com/ttmdung203/MDGroupAvatarView.git
-
-CHECKOUT OPTIONS:
-  MDGroupAvatarView:
-    :commit: 0f7357377f43f1e5157757e77813739428094a39
-    :git: https://github.com/ttmdung203/MDGroupAvatarView.git
+    :path: ".."
 
 SPEC CHECKSUMS:
-  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  MDGroupAvatarView: a01456e15fd882cd6cbec7a6c93a6568c79bd492
-  Nimble: 8fb9b4b34c535b2f32f52c6b9852d6f02d48610b
-  Nimble-Snapshots: e743439f26c2fa99d8f7e0d7c01c99bcb40aa6f2
-  Quick: 8024e4a47e6cc03a9d5245ef0948264fc6d27cff
-  SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
+  MDGroupAvatarView: 48ac6b46276ab40049c2e64f9835667fea039e4c
+  SDWebImage: b9a731e1d6307f44ca703b3976d18c24ca561e84
 
-PODFILE CHECKSUM: d29644617647956decefd85b8f9198edf6daed70
+PODFILE CHECKSUM: c266dc7868843505822cc40f025c03d3af649f61
 
-COCOAPODS: 1.1.1
+COCOAPODS: 1.11.3
